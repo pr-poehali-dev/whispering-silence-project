@@ -4,9 +4,9 @@ import Icon from "@/components/ui/icon";
 const BACKEND_URL = "https://functions.poehali.dev/f1734664-2817-4ae0-b55d-063881924103";
 
 const SERVICE_OPTIONS = [
-  "Нейро-фотосессия",
+  "AI Фотосессия",
   "Телеграм-стикеры",
-  "Фотосессия + стикеры",
+  "AI Фотосессия + стикеры",
 ];
 
 export default function OrderForm() {
@@ -32,6 +32,7 @@ export default function OrderForm() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!photo) return;
     setStatus("loading");
 
     let photoBase64: string | null = null;
@@ -128,10 +129,10 @@ export default function OrderForm() {
             </div>
 
             <div className="flex flex-col gap-1">
-              <label className="text-xs uppercase tracking-wide text-neutral-500">Фото (необязательно)</label>
+              <label className="text-xs uppercase tracking-wide text-neutral-500">Фото *</label>
               <div
                 onClick={() => fileRef.current?.click()}
-                className="border border-dashed border-neutral-300 px-4 py-6 flex flex-col items-center gap-2 cursor-pointer hover:border-neutral-900 transition-colors bg-neutral-50"
+                className={`border border-dashed px-4 py-6 flex flex-col items-center gap-2 cursor-pointer transition-colors bg-neutral-50 ${photo ? "border-neutral-900" : "border-neutral-300 hover:border-neutral-900"}`}
               >
                 <Icon name="Upload" size={24} className="text-neutral-400" />
                 <p className="text-sm text-neutral-500">
@@ -145,6 +146,9 @@ export default function OrderForm() {
                 onChange={handlePhoto}
                 className="hidden"
               />
+              {!photo && status === "loading" && (
+                <p className="text-red-500 text-xs">Пожалуйста, прикрепите фото</p>
+              )}
             </div>
 
             {status === "error" && (
