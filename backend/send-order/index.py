@@ -1,9 +1,10 @@
 import json
 import os
 import urllib.request
-import urllib.parse
+import urllib.error
 import base64
 import boto3
+
 
 def handler(event: dict, context) -> dict:
     """Принимает заявку с лендинга и отправляет её в Telegram."""
@@ -36,15 +37,14 @@ def handler(event: dict, context) -> dict:
     chat_id = os.environ['TELEGRAM_CHAT_ID']
 
     text = (
-        f"📸 *Новая заявка на bediff*\n\n"
-        f"👤 *Имя:* {name}\n"
-        f"📱 *Контакт:* {contact}\n"
-        f"🎯 *Услуга:* {service}\n"
-        f"💬 *Пожелание:* {wish if wish else '—'}\n"
-        f"🖼 *Фото:* {'приложено' if photo_base64 else 'не приложено'}"
+        f"\U0001f4f8 *Новая заявка на bediff*\n\n"
+        f"\U0001f464 *Имя:* {name}\n"
+        f"\U0001f4f1 *Контакт:* {contact}\n"
+        f"\U0001f3af *Услуга:* {service}\n"
+        f"\U0001f4ac *Пожелание:* {wish if wish else chr(8212)}\n"
+        f"\U0001f5bc *Фото:* {'приложено' if photo_base64 else 'не приложено'}"
     )
 
-    photo_url = None
     if photo_base64:
         s3 = boto3.client(
             's3',
@@ -56,7 +56,7 @@ def handler(event: dict, context) -> dict:
         key = f"orders/{contact.replace('@', '_')}_{photo_name}"
         s3.put_object(Bucket='files', Key=key, Body=photo_data, ContentType='image/jpeg')
         photo_url = f"https://cdn.poehali.dev/projects/{os.environ['AWS_ACCESS_KEY_ID']}/files/{key}"
-        text += f"\n🔗 {photo_url}"
+        text += f"\n\U0001f517 {photo_url}"
 
     api_url = f"https://api.telegram.org/bot{token}/sendMessage"
     payload = json.dumps({
