@@ -19,7 +19,7 @@ export default function Hero() {
         className="absolute inset-0 w-full h-full"
       >
         <img
-          src="/images/mountain-landscape.jpg"
+          src="https://i.ibb.co/Hfq5W0wb/mountain-landscape-jpg.jpg"
           alt="Mountain landscape"
           className="w-full h-full object-cover"
         />
