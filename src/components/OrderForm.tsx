@@ -15,11 +15,16 @@ export default function OrderForm() {
   const [service, setService] = useState(SERVICE_OPTIONS[0]);
   const [wish, setWish] = useState("");
   const [photo, setPhoto] = useState<File | null>(null);
+  const [photoPreview, setPhotoPreview] = useState<string | null>(null);
   const [status, setStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
   const fileRef = useRef<HTMLInputElement>(null);
 
   const handlePhoto = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files?.[0]) setPhoto(e.target.files[0]);
+    const file = e.target.files?.[0];
+    if (file) {
+      setPhoto(file);
+      setPhotoPreview(URL.createObjectURL(file));
+    }
   };
 
   const toBase64 = (file: File): Promise<string> =>
@@ -50,7 +55,7 @@ export default function OrderForm() {
       });
       if (res.ok) {
         setStatus("success");
-        setName(""); setContact(""); setWish(""); setPhoto(null);
+        setName(""); setContact(""); setWish(""); setPhoto(null); setPhotoPreview(null);
         if (fileRef.current) fileRef.current.value = "";
       } else {
         setStatus("error");
@@ -132,12 +137,21 @@ export default function OrderForm() {
               <label className="text-xs uppercase tracking-wide text-neutral-500">Фото *</label>
               <div
                 onClick={() => fileRef.current?.click()}
-                className={`border border-dashed px-4 py-6 flex flex-col items-center gap-2 cursor-pointer transition-colors bg-neutral-50 ${photo ? "border-neutral-900" : "border-neutral-300 hover:border-neutral-900"}`}
+                className={`border border-dashed cursor-pointer transition-colors bg-neutral-50 overflow-hidden ${photo ? "border-neutral-900" : "border-neutral-300 hover:border-neutral-900"}`}
               >
-                <Icon name="Upload" size={24} className="text-neutral-400" />
-                <p className="text-sm text-neutral-500">
-                  {photo ? photo.name : "Нажмите, чтобы загрузить фото"}
-                </p>
+                {photoPreview ? (
+                  <div className="relative">
+                    <img src={photoPreview} alt="Превью" className="w-full max-h-64 object-cover" />
+                    <div className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity">
+                      <p className="text-white text-sm">Нажмите, чтобы заменить</p>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="px-4 py-6 flex flex-col items-center gap-2">
+                    <Icon name="Upload" size={24} className="text-neutral-400" />
+                    <p className="text-sm text-neutral-500">Нажмите, чтобы загрузить фото</p>
+                  </div>
+                )}
               </div>
               <input
                 ref={fileRef}
