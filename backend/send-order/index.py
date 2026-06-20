@@ -50,7 +50,20 @@ def handler(event: dict, context) -> dict:
     gmail_user = 'burntime.dota@gmail.com'
     gmail_password = os.environ['GMAIL_APP_PASSWORD'].replace(' ', '')
 
-    photo_html = f'<a href="{photo_url}">Посмотреть фото</a>' if photo_url else '—'
+    if photo_url:
+        photo_html = f'''
+        <tr>
+          <td colspan="2" style="padding: 16px 0 8px 0; color: #666;">Фото клиента</td>
+        </tr>
+        <tr>
+          <td colspan="2" style="padding-bottom: 16px;">
+            <a href="{photo_url}">
+              <img src="{photo_url}" alt="Фото клиента" style="max-width: 400px; width: 100%; border-radius: 4px; display: block;" />
+            </a>
+          </td>
+        </tr>'''
+    else:
+        photo_html = '<tr><td style="padding: 8px 0; color: #666;">Фото</td><td style="padding: 8px 0;">—</td></tr>'
 
     html = f"""
     <html><body style="font-family: Arial, sans-serif; color: #222; max-width: 600px;">
@@ -60,7 +73,7 @@ def handler(event: dict, context) -> dict:
         <tr><td style="padding: 8px 0; color: #666;">Контакт</td><td style="padding: 8px 0;"><b>{contact}</b></td></tr>
         <tr><td style="padding: 8px 0; color: #666;">Услуга</td><td style="padding: 8px 0;"><b>{service}</b></td></tr>
         <tr><td style="padding: 8px 0; color: #666;">Пожелание</td><td style="padding: 8px 0;">{wish if wish else '—'}</td></tr>
-        <tr><td style="padding: 8px 0; color: #666;">Фото</td><td style="padding: 8px 0;">{photo_html}</td></tr>
+        {photo_html}
       </table>
     </body></html>
     """
