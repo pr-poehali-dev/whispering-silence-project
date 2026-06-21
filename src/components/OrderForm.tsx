@@ -16,12 +16,21 @@ export default function OrderForm() {
   const [wish, setWish] = useState("");
   const [photo, setPhoto] = useState<File | null>(null);
   const [photoPreview, setPhotoPreview] = useState<string | null>(null);
+  const [photoError, setPhotoError] = useState<string | null>(null);
   const [status, setStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
   const fileRef = useRef<HTMLInputElement>(null);
 
   const handlePhoto = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
+      if (file.size > 10 * 1024 * 1024) {
+        setPhotoError("Файл слишком большой. Максимальный размер — 10 МБ.");
+        setPhoto(null);
+        setPhotoPreview(null);
+        if (fileRef.current) fileRef.current.value = "";
+        return;
+      }
+      setPhotoError(null);
       setPhoto(file);
       setPhotoPreview(URL.createObjectURL(file));
     }
@@ -150,6 +159,7 @@ export default function OrderForm() {
                   <div className="px-4 py-6 flex flex-col items-center gap-2">
                     <Icon name="Upload" size={24} className="text-neutral-400" />
                     <p className="text-sm text-neutral-500">Нажмите, чтобы загрузить фото</p>
+                    <p className="text-xs text-neutral-400">До 10 МБ</p>
                   </div>
                 )}
               </div>
@@ -160,6 +170,9 @@ export default function OrderForm() {
                 onChange={handlePhoto}
                 className="hidden"
               />
+              {photoError && (
+                <p className="text-red-500 text-xs">{photoError}</p>
+              )}
               {!photo && status === "loading" && (
                 <p className="text-red-500 text-xs">Пожалуйста, прикрепите фото</p>
               )}
